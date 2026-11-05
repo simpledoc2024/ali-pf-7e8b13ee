@@ -178,6 +178,16 @@ const ANY=[
  ["Hard moments","He refuses to start","Ali does not want to start [subject]. Give me 3 calm ways to get him started in under 2 minutes, without pressure."],
  ["Hard moments","He's upset about a mistake","Ali got upset after a mistake in [subject]. What should I say right now, and how do we carry on?"],
  ["Hard moments","Only a few minutes","We have [10] minutes for [subject]. What is the single most useful thing to do? Short answer."],
+ ["Hard moments","Meltdown (now or just after)","Ali [is having / just had] a meltdown during [activity]. He is [still upset / calm now]. Use the Parent quick cards: what do I do right now, and how do we repair afterwards? Short answer with the exact words to say."],
+ ["Hard moments","He says \"I'm stupid\"","Ali said \"[what he said]\" about himself. How should I respond? Use the Parent quick cards. Short answer with the exact words to say."],
+ ["Hard moments","Can't focus today","Ali keeps drifting off or fidgeting during [subject]. Use the Parent quick cards: what can I change right now? Short answer."],
+ ["Hard moments","Same argument again","Ali and I keep arguing about [homework / screens / chores]. Use the Parent quick cards to help us solve it together at a calm time. Give me the steps and what to say."],
+ ["Everyday skills","Teach a life skill","Help me teach Ali to [skill, e.g. make a cheese sandwich / pay at a shop and check the change / use a clock for a start time]. Use the Parent quick cards: a short step-by-step checklist (with simple pictures I can draw), how to teach it, and safety points."],
+ ["Everyday skills","Which skill first?","Using \"Ali at a glance\" (everyday-skills goals), suggest 3 small everyday skills that would help Ali most now, and how to start one. Keep it light."],
+ ["Everyday skills","Talk with Ali about how he learns","Help me talk with Ali about how his brain and learning work, in a positive way. Use the Parent quick cards (card T1). Give me a short script and how to answer his questions."],
+ ["Maths checks","2-minute maths check","Give me the 2-minute check for [place value / number facts / written methods / fractions] from the Parent quick cards, ready to use with Ali."],
+ ["Maths checks","What to teach next","Ali did the [check name] check. His answers: [answers]. What do his answers show, and which pages in his maths books should we start from? Use the Library Index."],
+ ["Maths checks","Word problem, step by step","Help Ali with this word problem: [problem, or book + printed page + question]. Use the Parent quick cards word-problem steps (read, picture it, what is asked, plan, solve, check). Short answer."],
  ["Any book","Help with a page I have open","Help me teach Ali [book], printed page [__]. Retrieve the page from the Library first. Short answer: the steps and the exact words to say."],
  ["Any book","Find where a topic is taught","Which of Ali's books teaches [topic]? Use the Library Index and give the book, printed page and Library item."],
  ["Any book","Clean worksheet from any page",WS.replace('{B}, "{T}" ({W})','[book], printed page [__]')],
@@ -186,6 +196,8 @@ const ANY=[
  ["For you","Which guide should I read?","Which of our reference PDFs helps with [need, e.g. spelling]? Name the file and the pages."],
  ["For you","What do the reports say?","What do Ali's reports say about [area, e.g. reading comprehension]? Give the score and the file. Short answer."],
  ["For you","Is this too much?","Is [what we are doing] too much for Ali right now? Tell me honestly and what to cut."],
+ ["For you","Reports in plain words","Using \"Ali at a glance\", explain in plain words what Ali's reports say about [area, e.g. maths]. What does it mean for how I help him at home? Short answer."],
+ ["For you","When to ask a professional","I'm worried about [concern]. Use the Parent quick cards (card P1) and Ali's reports: is this something to ask a professional about, and who?"],
  ["Plans (optional)","Agree a small goal","Let's agree one small goal for Ali in [area]. Keep it small and realistic.","When you agree, ChatGPT writes a dated summary. Paste it at the top of \"Ali Goals and Plans\" and re-upload that file."],
  ["Plans (optional)","Review a goal","Here is how Ali has done on his [area] goal: [notes]. Should we keep, change or stop it?"]
 ];
@@ -200,7 +212,7 @@ let current=[];
 function shelf(){
   const grades=[4,5,6];
   $("shelf").innerHTML=grades.map(g=>`<div class="row"><span class="gr">Grade ${g}</span>${BOOKS.map((b,i)=>b.gr===g?`<button class="chip" type="button" id="book-${i}" data-book="${i}" aria-pressed="${state.book===i}">${esc(b.b)}</button>`:"").join("")}</div>`).join("")
-   +`<div class="row"><span class="gr">Any time</span><button class="chip" type="button" id="book-any" data-book="any" aria-pressed="${state.book==="any"}">Hard moments, your questions, plans</button></div>`;
+   +`<div class="row"><span class="gr">Any time</span><button class="chip" type="button" id="book-any" data-book="any" aria-pressed="${state.book==="any"}">Hard moments, everyday skills, maths checks, your questions</button></div>`;
 }
 function topics(){
   const box=$("topics");$("own").hidden=state.book==="any"&&!state.q;
@@ -220,12 +232,12 @@ function topics(){
 }
 function tbtn(bi,ti,t){const on=state.book===bi&&state.topic===ti;const ind=t.g&&!t.h&&!state.q?"&nbsp;&nbsp;":"";
   return `<button class="topic${t.h?" head":""}" type="button" id="t-${bi}-${ti}" data-b="${bi}" data-t="${ti}" aria-pressed="${on}"><span>${ind}${esc(t.t)}</span><span class="pg">${t.p?"p. "+esc(t.p):""}</span></button>`;}
-const ORDER=["Hard moments","Any book","Teach","Read & write","Practise","Check","Explore","For you","Plans (optional)"];
+const ORDER=["Hard moments","Everyday skills","Maths checks","Any book","Teach","Read & write","Practise","Check","Explore","For you","Plans (optional)"];
 function prompts(){
   let items=[],selHtml="";
   if(state.book==="any"){
     items=ANY.map(a=>({c:a[0],n:a[1],p:a[2],note:a[3]}));
-    selHtml=`<b>Any time</b><div>Prompts for hard moments, your own learning and optional plans.</div>`;
+    selHtml=`<b>Any time</b><div>Prompts for hard moments, everyday skills, maths checks, your own learning and optional plans.</div>`;
   }else{
     const b=BOOKS[state.book];const t=state.topic==null?null:(state.topic==="own"?state.own:b.topics[state.topic]);
     if(!t){$("sel").innerHTML=`<b>${esc(b.b)}</b><div>Choose a topic on the left to see its prompts.</div>`;$("cats").innerHTML="";$("list").innerHTML="";$("p-count").textContent="";return;}
